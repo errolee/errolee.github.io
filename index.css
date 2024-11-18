@@ -1,0 +1,121 @@
+/* Container for sorting card and lesson display */
+.lesson-container {
+  display: flex;                   /* Use flexbox for a side-by-side layout */
+  justify-content: space-between;  /* Space the items between the two sections */
+  align-items: flex-start;         /* Align sorting and lesson cards at the top */
+  margin: 20px;                    /* Add some outer margin */
+}
+
+/* Styling for the sorting card */
+.sorting-card {
+  background-color: #fff;           /* White background for the card */
+  border-radius: 10px;              /* Rounded corners */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);  /* Subtle shadow */
+  padding: 20px;                    /* Inner padding */
+  max-width: 250px;                 /* Set a fixed width for the sorting card */
+  flex-shrink: 0;                   /* Prevent the sorting card from shrinking */
+  margin-right: 20px;               /* Add space between the sorting card and lessons */
+}
+
+/* Card title styling */
+.sorting-card h3 {
+  color: #333;                      /* Darker text color */
+  font-family: 'Arial', sans-serif; /* Clean font */
+  margin-bottom: 15px;              /* Space below the title */
+}
+
+/* Styling for labels */
+.sorting-card label {
+  display: inline-block;            /* Display labels inline */
+  margin-bottom: 10px;              /* Space between labels */
+  font-family: 'Open Sans', sans-serif; /* Modern font */
+  font-size: 1em;                   /* Standard font size */
+  color: #555;                      /* Medium-dark text color */
+}
+
+/* Styling for radio inputs */
+.sorting-card input[type="radio"] {
+  margin-right: 10px;               /* Space between radio button and label text */
+  transform: scale(1.2);            /* Slightly enlarge radio buttons */
+  accent-color: #3498db;            /* Change color of radio buttons */
+}
+
+/* Hover effect for labels */
+.sorting-card label:hover {
+  color: #3498db;                   /* Change label color on hover */
+  cursor: pointer;                  /* Change cursor to pointer */
+}
+
+/* Additional hover and focus effects for radio inputs */
+.sorting-card input[type="radio"]:hover,
+.sorting-card input[type="radio"]:focus {
+  outline: 2px solid #3498db;       /* Outline on focus */
+}
+
+/* Container for the lessons */
+.lessons-container {
+  display: flex;                    /* Use flexbox for layout */
+  flex-wrap: wrap;                  /* Allow wrapping of items */
+  justify-content: flex-start;      /* Align lessons to the start */
+  gap: 20px;                        /* Space between the lesson cards */
+  flex-grow: 1;                     /* Allow this section to grow in width */
+}
+
+/* Individual lesson card styling */
+.lesson-card {
+  background-color: #fff;           /* White background for the card */
+  border-radius: 8px;               /* Slightly rounded corners for a modern look */
+  border: 0.5px solid #ccc;         /* Thin border */
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);  /* Softer, less prominent shadow */
+  padding: 8px;                     /* Inner padding (reduced) */
+  margin: 10px;                     /* Margin between cards */
+  flex: 1 1 calc(33% - 20px);       /* Flex-grow, flex-shrink, and base width */
+  max-width: calc(33% - 20px);      /* Maximum width for responsive design */
+  box-sizing: border-box;           /* Include padding and border in element's total width */
+}
+
+
+/* Styling for lesson titles */
+.lesson-card h2 {
+  color: #333;                      /* Darker text color */
+  font-family: 'Arial', sans-serif; /* Clean font */
+  margin-bottom: 10px;              /* Space below the title */
+}
+
+
+/* Styling for paragraphs in lesson cards */
+.lesson-card p {
+  color: #555;                      /* Medium-dark text color */
+  margin: 5px 0;                    /* Vertical spacing for paragraphs */
+}
+
+/* Button styling */
+.lesson-card button {
+  background-color: #3498db;        /* Button background color */
+  color: #fff;                      /* White text color */
+  border: none;                     /* No border */
+  border-radius: 5px;               /* Rounded corners for button */
+  padding: 10px 15px;               /* Inner padding */
+  cursor: pointer;                  /* Pointer cursor on hover */
+}
+
+/* Disable button styling */
+.lesson-card button:disabled {
+  background-color: #ccc;           /* Grey background for disabled button */
+  cursor: not-allowed;              /* Not allowed cursor for disabled */
+}
+
+/* Button-class for fixed view cart button */
+.button-class {
+  position: fixed;
+  top: 20px;                        /* Distance from the top of the screen */
+  right: 20px;                      /* Distance from the right side of the screen */
+  z-index: 1000;                    /* Ensure it stays on top of other elements */
+}
+.lesson-image {
+  width: 300px; /* Adjust size */
+  height: 300px;
+  object-fit: cover; /* Ensures the image scales proportionally */
+  margin-bottom: 10px; /* Add spacing below the image */
+  display: block; /* Ensures the image appears on its own line */
+}

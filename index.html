@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>After School Tuition</title>
+    <script src="https://unpkg.com/vue@2.7.8/dist/vue.js"></script>
+    <script src="lessons.js"></script>
+    <link rel="stylesheet" href="index.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+<body>
+    <div id="lessons"> 
+      <header>
+        <h1>{{ webtitle }}</h1>
+        <button id="ViewCart" v-on:click="showCheckout" :disabled="cart.length === 0" class="button-class">
+          <span class="fas fa-cart-plus"></span> {{ itemsInTheCart }} Shopping Cart
+        </button>
+      </header>
+      <p>
+      <strong>Search Lessons:</strong>
+      <input v-model="searchQuery" @input="filterLessons" placeholder="Type to search..." />
+    </p>
+      <div v-if="showlesson" class="sorting-card">
+        <h3>Sort by:</h3>
+        <label>
+          <input type="radio" v-model="sortKey" value="subject" @change="sortLessons"> Subject
+        </label>
+        <label>
+          <input type="radio" v-model="sortKey" value="location" @change="sortLessons"> Location
+        </label>
+        <label>
+          <input type="radio" v-model="sortKey" value="price" @change="sortLessons"> Price
+        </label>
+        <label>
+          <input type="radio" v-model="sortKey" value="availability" @change="sortLessons"> Availability
+          
+        </label>
+    
+        <!-- Sort Order (Ascending or Descending) -->
+        <h3>Order:</h3>
+        <label>
+          <input type="radio" v-model="sortOrder" value="asc" @change="sortLessons"> Ascending
+        </label>
+        <label>
+          <input type="radio" v-model="sortOrder" value="desc" @change="sortLessons"> Descending
+        </label>
+      </div>
+      
+      <main>
+        <div v-if="showlesson" class="lessons-container">
+          <div v-for="lesson in filteredLessons"  :key="lesson.subject" class="lesson-card">
+            <img v-if="lesson.image" :src="'static-images/' + lesson.image" alt="Lesson Image" class="lesson-image" />
+
+            <h2 v-text="lesson.subject"></h2>
+            <p v-text="lesson.location"></p>
+            <p>Price: ${{ lesson.price }}</p>
+            <p>Availability: {{ lesson.availability }}</p>
+
+            <!-- Add to Cart Button -->
+            <button v-if="canAddToCart(lesson)" v-on:click="addItemToTheCart(lesson)">Add to the Cart</button>
+            <div v-else>
+              <button disabled>Add to the Cart</button>
+              You have added all the available items for this product to your cart
+            </div> 
+          </div>
+        </div>
+
+        <!-- Cart Section -->
+        <div v-else>
+          <h1>Your Cart</h1> 
+          <div class="lessons-container">
+              <div v-for="lesson in cart" :key="lesson.subject" class="lesson-card">
+                  <i v-if="lesson.icon" :class="lesson.icon"></i>
+                  <h2 v-text="lesson.subject"></h2>
+                  <p v-text="lesson.location"></p>
+                  <p>Price: ${{ lesson.price }}</p>
+                  <button v-on:click="removeItemFromCart(lesson)">Remove from Cart</button>
+              </div>
+          </div>
+          <div>
+            <h1>Checkout</h1>
+            
+            <!-- Name Input Field -->
+            <p>
+              <strong>Name:</strong>
+              <input v-model="order.name" @input="validateName" />
+            </p>
+            
+            <!-- Error message for invalid name -->
+            <p v-if="nameError" style="color: red;">Please enter a valid name (no numbers allowed).</p>
+            
+            <!-- Phone Input Field -->
+            <p>
+              <strong>Phone:</strong>
+              <input v-model="order.phone" />
+            </p>
+            
+            <!-- Checkout Button -->
+            <button @click="checkout" :disabled="!isCheckoutEnabled">Checkout</button>
+            
+            <!-- Confirmation Message -->
+            <p v-if="confirmationMessage">{{ confirmationMessage }}</p>
+          </div>
+      </main>
+    
+      <script>
+        new Vue({
+            el: '#lessons',
+            data: {
+                webtitle: 'After School Tuition App',
+                showlesson: true,  // Toggle between lessons and checkout
+                lessons: lessons,   // Assuming lessons.js contains the lesson data
+                cart: [], 
+                order: {
+                    name: "",
+                    phone: "",
+                },         // Array to store cart items
+                sortKey: 'subject', // Default sort key
+                sortOrder: 'asc', // Default sort order (ascending)
+                searchQuery: '',
+                nameError: false,
+                phoneError:false,
+      confirmationMessage: '',
+          },
+            methods: {
+              fetchProducts() {
+            fetch('http://localhost:3000/lessons')
+                .then(response => {
+                    if (!response.ok) throw new Error('Failed to fetch lessons');
+                    return response.json();
+                })
+                .then(data => {
+                    this.lessons = data;
+                })
+                .catch(error => {
+                    console.error(error);
+                    alert('Could not load lessons. Please try again later.');
+                });
+        },
+             
+                compare(a, b) {
+                    if (a[this.sortKey] > b[this.sortKey]) return 1;
+                    if (a[this.sortKey] < b[this.sortKey]) return -1;
+                    return 0;
+                },
+                sortLessons() {
+                    this.lessons.sort((a, b) => {
+                        let result = this.compare(a, b);
+                        return this.sortOrder === 'asc' ? result : -result;
+                    });
+                },
+                showCheckout: function() {
+                    this.showlesson = !this.showlesson; // Toggle between lessons and checkout/cart
+                },
+                addItemToTheCart: function(lesson) {
+                    if (lesson.availability > 0) {
+                        this.cart.push(lesson);
+                        lesson.availability--;  // Decrease availability only if it's above 0
+                    }
+                },
+                removeItemFromCart: function(lesson) {
+                    this.cart.splice(this.cart.indexOf(lesson), 1); // Fix the splice method
+                    lesson.availability++;  // Increase availability when removed
+                },
+                canAddToCart: function(lesson) {
+                    return lesson.availability > 0;
+                },
+                validateName(name) {
+                    const nameRegex = /^[A-Za-z\s]+$/; // Allow letters and spaces
+                    return nameRegex.test(name);
+                },
+                validatePhone(phone) {
+                    const phoneRegex = /^[0-9]+$/; // Allow only numbers
+                    return phoneRegex.test(phone);
+                },
+                checkout() {
+                    // Validate name and phone before proceeding
+                    if (this.validateName(this.order.name) && this.validatePhone(this.order.phone)) {
+                        // Proceed with checkout
+                        this.confirmationMessage = "Order has been submitted successfully!";
+                        this.order.name = ""; // Clear the name input
+                        this.order.phone = ""; // Clear the phone input
+                    } else {
+                        this.confirmationMessage = "Please enter valid name and phone number.";
+                    }
+                }
+            },
+            computed: {
+                itemsInTheCart: function() {
+                    return this.cart.length || ""; // Display 0 if cart is empty
+                },
+                isCheckoutEnabled() {
+                    // Enable checkout button only if valid name and phone
+                    return this.validateName(this.order.name) && this.validatePhone(this.order.phone);
+                },
+                filteredLessons() {
+            // Filter lessons based on the search query
+            return this.lessons.filter(lesson => {
+                // Convert both lesson subject and searchQuery to lowercase for a case-insensitive search
+                return lesson.subject.toLowerCase().includes(this.searchQuery.toLowerCase());
+            });
+            }
+          },
+          mounted() {
+        this.fetchProducts(); // Fetch lessons when the Vue instance is mounted
+    }
+        }); 
+        
+    </script>    
+  
+</body>
+</html>
