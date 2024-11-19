@@ -119,3 +119,7 @@
   margin-bottom: 10px; /* Add spacing below the image */
   display: block; /* Ensures the image appears on its own line */
 }
+
+.lesson-icon{
+  font-size: 70px;
+}
