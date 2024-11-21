@@ -258,8 +258,7 @@
                         lesson.subject.toLowerCase().includes(this.searchQuery.toLowerCase())
                     );
                 },
-                computed: {
-    totalPrice() {
+                totalPrice() {
         return this.cart.reduce((sum, lesson) => sum + lesson.price, 0);
         console.log("Total Price:", total);
     },
@@ -267,7 +266,6 @@
         return !this.nameError && !this.phoneError && this.order.name && this.order.phone;
         console.log("Is Checkout Enabled:", enabled);
     },
-}
 
             },
             mounted() {
