@@ -102,7 +102,7 @@
                         <button @click="checkout" :disabled="!isCheckoutEnabled">Checkout</button>
                         <p v-if="confirmationMessage">{{ confirmationMessage }}</p>
                     </div>
-                    </div>
+                </div>
             </div>
             
         </main>
@@ -154,7 +154,7 @@
         fetch(`https://fullstack-backend-s1kh.onrender.com/lessons/${lesson._id}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ availability: lesson.availability })
+            body: JSON.stringify({ availability: lesson.availability  })
         })
         .then(response => response.json())
         .then(data => {
@@ -163,9 +163,6 @@
         .catch(error => {
             console.error('Error updating lesson availability:', error);
         });
-        console.log('Before decrement:', lesson.availability);
-       console.log('After decrement:', lesson.availability - 1);
-
     }
 },
 
@@ -216,7 +213,7 @@
                 this.confirmationMessage = "Order submitted successfully!";
                 this.cart = [];  // Clear the cart
                 this.order = { name: "", phone: "" };  // Reset order form
-                //this.showlesson = true;//
+                this.showlesson = true;
             } else {
                 this.confirmationMessage = "Failed to submit order.";
             }
