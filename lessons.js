@@ -4,7 +4,7 @@ let lessons =[
     location: 'Port-louis', 
     price: 1000, 
     availability: 5,
-    image: "maths.jpg" 
+    icon: 'fas fa-calculator'
 
   },
   {
@@ -12,7 +12,7 @@ let lessons =[
     location: 'Albion', 
     price: 1800, 
     availability: 5,
-    image: 'physics.jgp.jpeg'
+    icon: 'fas fa-rocket'
   },
   {
     subject: 'Spanish', 
