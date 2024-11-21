@@ -74,7 +74,7 @@
 
             <!-- Cart Section -->
             <div v-else>
-                <!-- <h1>Your Cart</h1>  
+                <h1>Your Cart</h1>  
                 <div class="lessons-container">
                     <div v-for="lesson in cart" :key="lesson.id" class="lesson-card">
                         <h2 v-text="lesson.subject"></h2>
@@ -83,36 +83,36 @@
                         <button v-on:click="removeItemFromCart(lesson)">Remove from Cart</button>
                     </div>
                 </div>
-                <div> -->
-                <h1>Checkout</h1>
-                <div class="cartSummary">
-                    <h2>Cart Summary</h2>
-                    <ul>
-                        <!-- Loop through cart items and display details -->
-                        <li v-for="lesson in cart" :key="lesson.id">
-                            <div class="lesson-card">
-                                <p><strong>{{ lesson.subject }}</strong></p>
-                                <p>Price: ${{ lesson.price }}</p>
-                                <p v-if="lesson.availability > 1">Spaces: {{ lesson.availability }}</p>
-                                <button @click="removeItemFromCart(lesson)">Remove</button>
-                            </div>
-                        </li>
-                    </ul>
+                <div>
+                    <h1>Checkout</h1>
+                    <div class="cartSummary">
+                        <h2>Cart Summary</h2>
+                        <ul>
+                            <!-- Loop through cart items and display details -->
+                            <li v-for="lesson in cart" :key="lesson.id">
+                                <div class="lesson-card">
+                                    <p><strong>{{ lesson.subject }}</strong></p>
+                                    <p>Price: ${{ lesson.price }}</p>
+                                    <p v-if="lesson.availability > 1">Spaces: {{ lesson.availability }}</p>
+                                    <button @click="removeItemFromCart(lesson)">Remove</button>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                    <form>
+                        <p><strong>Name:</strong> <input v-model.trim="order.name" /></p>
+                        <p><strong>Phone:</strong> <input v-model.trim="order.phone" type="tel" /></p>
+                    </form>
+                    <div class="detail">
+                        <div class="details">
+                            <h1>Your Details</h1>
+                            <p>Name: <strong>{{ order.name }}</strong></p>
+                            <p>Phone: <strong>{{ order.phone }}</strong></p>
+                        </div>                        
+                        <button @click="checkout" :disabled="!isCheckoutEnabled">Checkout</button>
+                        <p v-if="confirmationMessage">{{ confirmationMessage }}</p>
+                    </div>
                 </div>
-                <form>
-                    <p><strong>Name:</strong> <input v-model.trim="order.name" /></p>
-                    <p><strong>Phone:</strong> <input v-model.trim="order.phone" type="tel" /></p>
-                </form>
-                <div class="detail">
-                    <div class="details">
-                        <h1>Your Details</h1>
-                        <p>Name: <strong>{{ order.name }}</strong></p>
-                        <p>Phone: <strong>{{ order.phone }}</strong></p>
-                    </div>                        
-                    <button @click="checkout" :disabled="!isCheckoutEnabled">Checkout</button>
-                    <p v-if="confirmationMessage">{{ confirmationMessage }}</p>
-                </div>
-                <!-- </div> -->
             </div>
             
         </main>
@@ -164,7 +164,7 @@
         fetch(`https://fullstack-backend-s1kh.onrender.com/lessons/${lesson._id}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ availability: lesson.availability - 1 })
+            body: JSON.stringify({ availability: lesson.availability  })
         })
         .then(response => response.json())
         .then(data => {
@@ -223,6 +223,7 @@
                 this.confirmationMessage = "Order submitted successfully!";
                 this.cart = [];  // Clear the cart
                 this.order = { name: "", phone: "" };  // Reset order form
+                this.showlesson = true;
             } else {
                 this.confirmationMessage = "Failed to submit order.";
             }
