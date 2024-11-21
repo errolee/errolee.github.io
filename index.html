@@ -146,36 +146,22 @@
                     this.showlesson = !this.showlesson;
                 },
                 addItemToCart(lesson) {
-    if (lesson.availability > 0) {
-        this.cart.push(lesson);
-        this.$set(lesson, 'availability', lesson.availability - 1);
-        
-        // PUT request to update availability on the server
-        fetch(`https://fullstack-backend-s1kh.onrender.com/lessons/${lesson._id}`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ availability: lesson.availability  })
-        })
-        .then(response => response.json())
-        .then(data => {
-            console.log('Lesson updated:', data);
-        })
-        .catch(error => {
-            console.error('Error updating lesson availability:', error);
-        });
-    }
-},
-
-
+                    if (lesson.availability > 0) {
+                        this.cart.push(lesson);
+                        this.$set(lesson, 'availability', lesson.availability - 1);
+                    }
+                },
                 removeItemFromCart(lesson) {
-    const index = this.cart.findIndex(item => item.id === lesson.id);
-    if (index !== -1) {
-        this.cart.splice(index, 1);
-        this.$set(lesson, 'availability', lesson.availability + 1);
-        console.log("Cart after removing item:", this.cart);
-    }
-},
-
+                    const index = this.cart.findIndex(item => item.id === lesson.id);
+                    if (index !== -1) {
+                        this.cart.splice(index, 1);
+                        this.$set(lesson, 'availability', lesson.availability + 1);
+                        console.log("Cart after removing item:", this.cart);
+                    }
+                    if (this.cart.length === 0) {
+                        this.showlesson = true;
+                    }
+                },
                 canAddToCart(lesson) {
                     return lesson.availability > 0;
                 },
@@ -189,45 +175,62 @@
                 },
                 checkout() {
                     if (!this.nameError && !this.phoneError) {
-        const orderData = {
-            name: this.order.name,
-            phone: this.order.phone,
-            lessons: this.cart.map(lesson => ({
-                lessonID: lesson._id,  // Use MongoDB's `_id` as lessonID
-                spaces: lesson.spaces || 1  // Default to 1 if not specified
-            })),
-            totalPrice: this.cart.reduce(
-                (sum, lesson) => sum + lesson.price * (lesson.spaces || 1), 
-                
-            ),
-        };
+                        const orderData = {
+                            name: this.order.name,
+                            phone: this.order.phone,
+                            lessons: this.cart.map(lesson => ({
+                                lessonID: lesson._id,  // Use MongoDB's `_id` as lessonID
+                                spaces: lesson.spaces || 1  // Default to 1 if not specified
+                            })),
+                            totalPrice: this.cart.reduce(
+                                (sum, lesson) => sum + lesson.price * (lesson.spaces || 1), 0
+                            ),
+                        };
 
-        fetch('https://fullstack-backend-s1kh.onrender.com/order', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(orderData),
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.insertedId) {
-                this.confirmationMessage = "Order submitted successfully!";
-                this.cart = [];  // Clear the cart
-                this.order = { name: "", phone: "" };  // Reset order form
-                this.showlesson = true; // show lesson true
-            } else {
-                this.confirmationMessage = "Failed to submit order.";
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            this.confirmationMessage = "An error occurred.";
-        });
-    } else {
-        this.confirmationMessage = "Please fix errors before submitting.";
-    }
-    
-},
-
+                        // Update lesson availability on the server
+                        Promise.all(
+                            this.cart.map(lesson => {
+                                return fetch(`https://fullstack-backend-s1kh.onrender.com/${lesson._id}`, {
+                                    method: 'PUT',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({ availability: lesson.availability })
+                                })
+                                    .then(response => response.json())
+                                    .then(data => {
+                                        console.log('Lesson updated:', data);
+                                    })
+                                    .catch(error => {
+                                        console.error('Error updating lesson availability:', error);
+                                    });
+                            })
+                        )
+                            .then(() => {
+                                // Submit the order only after availability is updated
+                                return fetch('https://fullstack-backend-s1kh.onrender.com/order', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify(orderData),
+                                });
+                            })
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.insertedId) {
+                                    alert("Your order has been placed successfully!");
+                                    this.cart = [];  // Clear the cart
+                                    this.order = { name: "", phone: "" };  // Reset order form
+                                    this.showlesson = true; // show lesson true
+                                } else {
+                                    alert("Failed to submit order.");
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Error:', error);
+                                this.confirmationMessage = "An error occurred.";
+                            });
+                    } else {
+                        this.confirmationMessage = "Please fix errors before submitting.";
+                    }
+                },
                 sortLessons() {
                     this.lessons = [...this.lessons].sort((a, b) => {
                         let result = a[this.sortKey] > b[this.sortKey] ? 1 : -1;
@@ -249,14 +252,8 @@
                     );
                 },
                 totalPrice() {
-        return this.cart.reduce((sum, lesson) => sum + lesson.price, 0);
-        console.log("Total Price:", total);
-    },
-    isCheckoutEnabled() {
-        return !this.nameError && !this.phoneError && this.order.name && this.order.phone;
-        console.log("Is Checkout Enabled:", enabled);
-    },
-
+                    return this.cart.reduce((sum, lesson) => sum + lesson.price, 0); //display totalprice
+                },
             },
             mounted() {
                 this.fetchProducts();
