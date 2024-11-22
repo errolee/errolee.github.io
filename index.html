@@ -83,7 +83,7 @@
                                 <div class="lesson-card">
                                     <p><strong>{{ lesson.subject }}</strong></p>
                                     <p>Price: ${{ lesson.price }}</p>
-                                    <p v-if="lesson.availability > 1">availability: {{ lesson.availability }}</p>
+                                    <p v-if="lesson.availability > 1">Spaces: {{ lesson.availability }}</p>
                                     <button @click="removeItemFromCart(lesson)">Remove</button>
                                 </div>
                             </li>
@@ -180,10 +180,10 @@
                             phone: this.order.phone,
                             lessons: this.cart.map(lesson => ({
                                 lessonID: lesson._id,  // Use MongoDB's `_id` as lessonID
-                                availability: lesson.availability || 1  // Default to 1 if not specified
+                                spaces: lesson.spaces || 1  // Default to 1 if not specified
                             })),
                             totalPrice: this.cart.reduce(
-                                (sum, lesson) => sum + lesson.price * (lesson.availability || 1), 0
+                                (sum, lesson) => sum + lesson.price * (lesson.spaces || 1), 0
                             ),
                         };
 
@@ -193,7 +193,7 @@
                                 return fetch(`https://fullstack-backend-s1kh.onrender.com/${lesson._id}`, {
                                     method: 'PUT',
                                     headers: { 'Content-Type': 'application/json' },
-                                    body: JSON.stringify({ availability: lesson.availability - (lesson.availability || 1)}) //add the lessons.spaces
+                                    body: JSON.stringify({ availability: lesson.availability - (lesson.spaces || 1)}) //add the lessons.spaces
                                 })
                                     .then(response => response.json())
                                     .then(data => {
