@@ -83,7 +83,7 @@
                                 <div class="lesson-card">
                                     <p><strong>{{ lesson.subject }}</strong></p>
                                     <p>Price: ${{ lesson.price }}</p>
-                                    <p v-if="lesson.availability > 1">Spaces: {{ lesson.availability }}</p>
+                                    <p v-if="lesson.availability > 1">availability: {{ lesson.availability }}</p>
                                     <button @click="removeItemFromCart(lesson)">Remove</button>
                                 </div>
                             </li>
