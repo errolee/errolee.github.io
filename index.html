@@ -142,15 +142,13 @@
                             alert('Could not load lessons. Please try again later.');  // Show an alert message to the user saying something went wrong
                         });
                 },
-                toggleView() { // Function to toggle between showing and hiding lessons This function flips a switch to show or hide the lessons. Think of it like a light switch — if the lessons are visible, it hides them, and if they are hidden, it makes them visible.
-                    this.showlesson = !this.showlesson; // Change the value of `showlesson` to the opposite
-    // If `showlesson` is true (lessons are visible), it becomes false (hidden), and vice versa
+                toggleView() { // Function to toggle between showing and hiding lessons 
+                    this.showlesson = !this.showlesson; // Change the value of `showlesson` 
                 },
                 addItemToCart(lesson) { // Function to add a lesson to the shopping cart
                     if (lesson.availability > 0) { // Check if the lesson has available spaces
                         this.cart.push(lesson);   // Add the lesson to the cart
                         this.$set(lesson, 'availability', lesson.availability - 1); // Decrease the availability count for the lesson by 1
-        // `$set` ensures that Vue updates the UI properly to reflect the change Vue’s special $set method is used to make sure the app notices the availability change and updates the screen for the user.
                     }
                 },
                 removeItemFromCart(lesson) { // Find the position (index) of the lesson in the cart
@@ -158,7 +156,7 @@
                     if (index !== -1) { // If the lesson is found in the cart (index is not -1)
                         this.cart.splice(index, 1); // Remove the lesson from the cart using its position (index)
                         this.$set(lesson, 'availability', lesson.availability + 1);  // Increase the availability of the lesson by 1
-        // This tells Vue to update the availability properly on the UI
+                
                         console.log("Cart after removing item:", this.cart);  // Log the updated cart in the console (for debugging)
                     }
                     if (this.cart.length === 0) { // If the cart is now empty (no items left)
@@ -178,9 +176,7 @@
                 },
                 validatePhone() { // Create a rule (regex) to check if the phone number only contains numbers
                     const phoneRegex = /^[0-9]+$/;
-                    this.phoneError = !phoneRegex.test(this.order.phone);  // Test if the phone number follows the rule
-    // If it doesn't, set `phoneError` to true (there's an error)
-    // If it does, set `phoneError` to false (no error)
+                    this.phoneError = !phoneRegex.test(this.order.phone);  // 
                 },
                 checkout() { // Check if there are no errors in the name or phone inputs
                     if (!this.nameError && !this.phoneError) {  // Create the order data to send to the backend
