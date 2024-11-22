@@ -180,10 +180,10 @@
                             phone: this.order.phone,
                             lessons: this.cart.map(lesson => ({
                                 lessonID: lesson._id,  // Use MongoDB's `_id` as lessonID
-                                spaces: lesson.spaces || 1  // Default to 1 if not specified
+                                availability: lesson.availability || 1  // Default to 1 if not specified
                             })),
                             totalPrice: this.cart.reduce(
-                                (sum, lesson) => sum + lesson.price * (lesson.spaces || 1), 0
+                                (sum, lesson) => sum + lesson.price * (lesson.availability || 1), 0
                             ),
                         };
 
