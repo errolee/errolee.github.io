@@ -193,7 +193,7 @@
                                 return fetch(`https://fullstack-backend-s1kh.onrender.com/${lesson._id}`, {
                                     method: 'PUT',
                                     headers: { 'Content-Type': 'application/json' },
-                                    body: JSON.stringify({ availability: lesson.availability - (lesson.spaces || 1)}) //add the lessons.spaces
+                                    body: JSON.stringify({ availability: lesson.availability })
                                 })
                                     .then(response => response.json())
                                     .then(data => {
@@ -252,7 +252,7 @@
                     );
                 },
                 totalPrice() {
-                    return this.cart.reduce((sum, lesson) => sum + lesson.price, 0); //display totalprice
+                    return this.cart.reduce((sum, lesson) => sum + lesson.price, 0);
                 },
             },
             mounted() {
