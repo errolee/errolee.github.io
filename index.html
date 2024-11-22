@@ -128,92 +128,101 @@
                 confirmationMessage: '',
             },
             methods: {
-                fetchProducts() {
+                fetchProducts() { // Fetch the lessons data from the backend
                     fetch('https://fullstack-backend-s1kh.onrender.com/lessons')
-                        .then(response => {
-                            if (!response.ok) throw new Error('Failed to fetch lessons');
-                            return response.json();
+                        .then(response => {  // Check if the response from the server is OK
+                            if (!response.ok) throw new Error('Failed to fetch lessons'); // If the server says something is wrong, throw an error
+                            return response.json(); // If the response is OK, convert it to JSON (a format for data)
                         })
-                        .then(data => {
+                        .then(data => { // Save the lessons data from the server into the lessons variable
                             this.lessons = data;
                         })
-                        .catch(error => {
+                        .catch(error => { // If there's an error, log it in the console for debugging
                             console.error(error);
-                            alert('Could not load lessons. Please try again later.');
+                            alert('Could not load lessons. Please try again later.');  // Show an alert message to the user saying something went wrong
                         });
                 },
-                toggleView() {
-                    this.showlesson = !this.showlesson;
+                toggleView() { // Function to toggle between showing and hiding lessons This function flips a switch to show or hide the lessons. Think of it like a light switch — if the lessons are visible, it hides them, and if they are hidden, it makes them visible.
+                    this.showlesson = !this.showlesson; // Change the value of `showlesson` to the opposite
+    // If `showlesson` is true (lessons are visible), it becomes false (hidden), and vice versa
                 },
-                addItemToCart(lesson) {
-                    if (lesson.availability > 0) {
-                        this.cart.push(lesson);
-                        this.$set(lesson, 'availability', lesson.availability - 1);
+                addItemToCart(lesson) { // Function to add a lesson to the shopping cart
+                    if (lesson.availability > 0) { // Check if the lesson has available spaces
+                        this.cart.push(lesson);   // Add the lesson to the cart
+                        this.$set(lesson, 'availability', lesson.availability - 1); // Decrease the availability count for the lesson by 1
+        // `$set` ensures that Vue updates the UI properly to reflect the change Vue’s special $set method is used to make sure the app notices the availability change and updates the screen for the user.
                     }
                 },
-                removeItemFromCart(lesson) {
+                removeItemFromCart(lesson) { // Find the position (index) of the lesson in the cart
                     const index = this.cart.findIndex(item => item.id === lesson.id);
-                    if (index !== -1) {
-                        this.cart.splice(index, 1);
-                        this.$set(lesson, 'availability', lesson.availability + 1);
-                        console.log("Cart after removing item:", this.cart);
+                    if (index !== -1) { // If the lesson is found in the cart (index is not -1)
+                        this.cart.splice(index, 1); // Remove the lesson from the cart using its position (index)
+                        this.$set(lesson, 'availability', lesson.availability + 1);  // Increase the availability of the lesson by 1
+        // This tells Vue to update the availability properly on the UI
+                        console.log("Cart after removing item:", this.cart);  // Log the updated cart in the console (for debugging)
                     }
-                    if (this.cart.length === 0) {
-                        this.showlesson = true;
+                    if (this.cart.length === 0) { // If the cart is now empty (no items left)
+                        this.showlesson = true; // Switch back to showing the lessons
                     }
                 },
-                canAddToCart(lesson) {
+                canAddToCart(lesson) { // Check if the lesson still has available spots
+    // If `availability` is greater than 0, you can add it to the cart
                     return lesson.availability > 0;
                 },
-                validateName() {
+                validateName() {  // Create a rule (regex) to check if the name only contains letters and spaces
                     const nameRegex = /^[A-Za-z\s]+$/;
                     this.nameError = !nameRegex.test(this.order.name);
+    // Test if the name entered follows the rule
+    // If it doesn't, set `nameError` to true (there's an error)
+    // If it does, set `nameError` to false (no error)
                 },
-                validatePhone() {
+                validatePhone() { // Create a rule (regex) to check if the phone number only contains numbers
                     const phoneRegex = /^[0-9]+$/;
-                    this.phoneError = !phoneRegex.test(this.order.phone);
+                    this.phoneError = !phoneRegex.test(this.order.phone);  // Test if the phone number follows the rule
+    // If it doesn't, set `phoneError` to true (there's an error)
+    // If it does, set `phoneError` to false (no error)
                 },
-                checkout() {
-                    if (!this.nameError && !this.phoneError) {
-                        const orderData = {
+                checkout() { // Check if there are no errors in the name or phone inputs
+                    if (!this.nameError && !this.phoneError) {  // Create the order data to send to the backend
+                        const orderData = { // Include the customer's name
                             name: this.order.name,
                             phone: this.order.phone,
-                            lessons: this.cart.map(lesson => ({
+                            lessons: this.cart.map(lesson => ({// Map each lesson in the cart to only include the ID and the number of spaces
                                 lessonID: lesson._id,  // Use MongoDB's `_id` as lessonID
                                 spaces: lesson.spaces || 1  // Default to 1 if not specified
                             })),
                             totalPrice: this.cart.reduce(
                                 (sum, lesson) => sum + lesson.price * (lesson.spaces || 1), 0
-                            ),
+                            ),// Calculate the total price of the lessons in the cart
                         };
 
                         // Update lesson availability on the server
                         Promise.all(
-                            this.cart.map(lesson => {
-                                return fetch(`https://fullstack-backend-s1kh.onrender.com/${lesson._id}`, {
-                                    method: 'PUT',
-                                    headers: { 'Content-Type': 'application/json' },
-                                    body: JSON.stringify({ availability: lesson.availability })
+                            this.cart.map(lesson => { // Go through each lesson in the cart and update its availability on the server
+                                return fetch(`https://fullstack-backend-s1kh.onrender.com/${lesson._id}`, {  // Send a PUT request to update the lesson's availability
+                                    method: 'PUT', //We're updating data, so we use PUT
+                                    headers: { 'Content-Type': 'application/json' },  // Tell the server we're sending JSON data
+                                    body: JSON.stringify({ availability: lesson.availability }) // Send the new availability
                                 })
-                                    .then(response => response.json())
+                                    .then(response => response.json()) // Convert the server's response to JSON
                                     .then(data => {
                                         console.log('Lesson updated:', data);
-                                    })
+                                    }) // Log a success message for each updated lesson
                                     .catch(error => {
                                         console.error('Error updating lesson availability:', error);
-                                    });
+                                    }); // Log an error if something goes wrong
                             })
                         )
                             .then(() => {
                                 // Submit the order only after availability is updated
-                                return fetch('https://fullstack-backend-s1kh.onrender.com/order', {
+                                return fetch('https://fullstack-backend-s1kh.onrender.com/order', {  // After updating all lessons, send the final order to the server
                                     method: 'POST',
                                     headers: { 'Content-Type': 'application/json' },
                                     body: JSON.stringify(orderData),
                                 });
                             })
                             .then(response => response.json())
-                            .then(data => {
+                            .then(data => { // Check if the order was successfully submitted
                                 if (data.insertedId) {
                                     alert("Your order has been placed successfully!");
                                     this.cart = [];  // Clear the cart
@@ -223,7 +232,7 @@
                                     alert("Failed to submit order.");
                                 }
                             })
-                            .catch(error => {
+                            .catch(error => { // Handle any errors that happened during the process
                                 console.error('Error:', error);
                                 this.confirmationMessage = "An error occurred.";
                             });
@@ -231,33 +240,36 @@
                         this.confirmationMessage = "Please fix errors before submitting.";
                     }
                 },
-                sortLessons() {
-                    this.lessons = [...this.lessons].sort((a, b) => {
+                sortLessons() {// Create a new copy of the lessons list to avoid changing the original one
+                    this.lessons = [...this.lessons].sort((a, b) => { // Compare two lessons based on the property we're sorting by (e.g., subject, price)
                         let result = a[this.sortKey] > b[this.sortKey] ? 1 : -1;
                         return this.sortOrder === 'asc' ? result : -result;
-                    });
+                    }); // If we're sorting in ascending order, return the comparison result as is,
+        // otherwise, reverse the result (for descending order)
                 },
             },
             computed: {
-                itemsInTheCart() {
+                itemsInTheCart() {  // Return the number of items (lessons) in the cart
                     return this.cart.length;
                 },
-                isCheckoutEnabled() {
+                isCheckoutEnabled() { // Check if checkout is possible by making sure:
+    // - There are no errors in the name or phone fields
+    // - The name and phone fields are filled
                     return !this.nameError && !this.phoneError && this.order.name && this.order.phone;
                 },
-                filteredLessons() {
-                    if (!Array.isArray(this.lessons)) return [];
+                filteredLessons() {   // If lessons are not in an array format, return an empty array
+                    if (!Array.isArray(this.lessons)) return [];   // Filter the lessons to only show those that match the search query
                     return this.lessons.filter(lesson =>
                         lesson.subject.toLowerCase().includes(this.searchQuery.toLowerCase())
                     );
                 },
-                totalPrice() {
+                totalPrice() {   // Calculate the total price of all lessons in the cart
                     return this.cart.reduce((sum, lesson) => sum + lesson.price, 0);
                 },
             },
             mounted() {
                 this.fetchProducts();
-                console.log("Cart data:", this.cart); // first part
+                console.log("Cart data:", this.cart); // Fetch the lessons when the page is ready.
             }
         });
     </script>
